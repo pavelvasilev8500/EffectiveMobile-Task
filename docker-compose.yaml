@@ -39,7 +39,7 @@ volumes:
   nginxconf:
     name: nginxconf
   backendlogs:
-    name: backendlogspkf
+    name: backendlogs
 
 networks:
   internal:
