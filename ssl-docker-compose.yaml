@@ -1,0 +1,58 @@
+version: "3.9"
+
+services:
+  nginx:
+    image: nginx:1.29.8-alpine
+    container_name: proxy
+    hostname: proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    healthcheck:
+      test: ["CMD", "curl", "-fk", "http://localhost"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - nginxconf:/etc/nginx/conf.d/
+      - sslfolder:/etc/ssl/app
+      - backendlogs:/var/log/nginx
+    restart: unless-stopped
+    networks:
+      - internal
+      - external
+
+  backend:
+    image: pythonserver:latest
+    container_name: backend
+    hostname: backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - internal
+
+volumes:
+  nginxconf:
+    name: nginxconf
+  sslfolder:
+    name: sslfolder
+  backendlogs:
+    name: backendlogspkf
+
+networks:
+  internal:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.0.0/29
+          gateway: 192.168.0.1
+  external:
+    driver: bridge
