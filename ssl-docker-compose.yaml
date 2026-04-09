@@ -43,7 +43,7 @@ volumes:
   sslfolder:
     name: sslfolder
   backendlogs:
-    name: backendlogspkf
+    name: backendlogs
 
 networks:
   internal:
